@@ -102,21 +102,13 @@ begin
   exact (order_equiv_is_equiv (k+k)).1  (x.append y),
 end
 -- -If S is an emulator of E and T is an emulator of S then T is an emulator of E.
-theorem emulator_transitivity:   is_emulator S E ∧ is_emulator T S → is_emulator T E :=
-begin
-intros h,
-cases h with e_S_E e_T_S,
-rw is_emulator,
-rw is_emulator at e_S_E,
-rw is_emulator at e_T_S,
-intros x x_in_T y y_in_T,
-have S_emulates_T := e_T_S x x_in_T y y_in_T,
-rcases S_emulates_T with ⟨ z,z_in_S,w, w_in_S, ord_equiv⟩ ,
-have E_emulates_S := e_S_E z z_in_S w w_in_S,
-rcases E_emulates_S with ⟨ g,g_in_E,h, h_in_E, ord_equiv2⟩ ,
-have trans := (order_equiv_is_equiv (k+k)).2.2 ord_equiv ord_equiv2,
-exact ⟨g,g_in_E,h,h_in_E ,trans⟩, 
 
+theorem emulator_trans {k : ℕ} (A B C : set (vector ℚ k)) :
+  is_emulator A B → is_emulator B C → is_emulator A C :=
+begin
+  intros h1 h2,
+  rw emulator_iff_EC_subset at h1 h2 ⊢,
+  exact subset_trans h1 h2,
 end
 
 --This is useless
