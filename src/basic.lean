@@ -42,8 +42,7 @@ begin
 end
 -- An emulator of E  Q[-1,1]
 -- 2 is an S  Q[-1,1]2 such that any pair of elements of S "look like" some pair of elements of E. I.e., for all x,y  S there exists z,w  E such that xy is order equivalent to zw. Note that we are allowing E to be finite or infinite, or even .
--- #check E
-def is_emulator : Prop := ∀ (x y ∈   S), ∃ (z w ∈  E), (vector.append x y) == (vector.append z w)
+def is_emulator : Prop := ∀ (x y ∈   S), ∃ (z w ∈  E), (vector.append x y) = (vector.append z w)
 
 
 -- Every subset of E is an emulator of E.
@@ -56,3 +55,5 @@ theorem emulator_transitivity:   is_emulator S E ∧ is_emulator T S → is_emul
 begin
 sorry,
 end
+
+
