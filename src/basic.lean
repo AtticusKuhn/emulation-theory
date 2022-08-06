@@ -60,3 +60,5 @@ def oe (k : ℕ): setoid (tuple k) := {
   r := order_equivalent k,
   iseqv := order_equiv_is_equiv k
 }
+def is_order_invaraint (S:set (type_tuple ℚ 2 )) : Prop := 
+   ∀ (x y : type_tuple ℚ 2 ), (order_equivalent 2 x y) → (x ∈ S ↔ y ∈ S )
