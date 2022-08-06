@@ -4,6 +4,7 @@ import set_theory.zfc.basic
 import data.vector
 import data.rat
 import tactic
+import tactic.rewrite_all.basic
 open vector
 
 
@@ -22,7 +23,7 @@ def type_tuple (t:Type ) (n : ℕ )  : Type := vector t n
 def tuple (n : ℕ ) : Type := type_tuple  ℚ n 
 
 variables (A B C D E S T U V :   set (type_tuple ℚ k )) [fintype ↥S]
-variables (v1 v2 v3 :   vector ℚ k) 
+variables (v1 v2 v3 :   type_tuple ℚ k) 
 
 -- definition of order equivalence
 def order_equivalent (k : ℕ) (x : vector ℚ k) (y : vector ℚ k) : Prop :=
@@ -61,7 +62,7 @@ def EC {k : ℕ} (S : set (vector ℚ k)) : set (quotient (oe (k+k))) :=
 {c : quotient (oe (k+k)) | ∃ (x y ∈ S), c = ⟦vector.append x y⟧}
 
 -- definition of emulators
-def is_emulator {k : ℕ} (E S : set (vector ℚ k)): Prop :=
+def is_emulator {k : ℕ} (E S : set (type_tuple ℚ k)): Prop :=
 ∀ (x y ∈ E), ∃ (z w ∈ S), order_equivalent (k+k) (vector.append x y) (vector.append z w)
 
 -- very useful relation between emulators and EC's
@@ -106,9 +107,8 @@ end
 theorem emulator_trans :
   is_emulator A B → is_emulator B C → is_emulator A C :=
 begin
-  intros h1 h2,
-  rw emulator_iff_EC_subset at h1 h2 ⊢,
-  exact subset_trans h1 h2,
+  repeat{ rw emulator_iff_EC_subset at  ⊢},
+  exact subset_trans,
 end
 
 --This is useless
@@ -131,7 +131,23 @@ def is_order_theoretic (S:set (type_tuple ℚ k )):Prop
 
 
 -- OPEN PROBLEM B. What is the smallest cardinality m of such an E in 11? What is the relationship between the n in Open Problem A and this m here? 
-theorem open_problem_B: ∃ (S : set (type_tuple ℚ k )) [fintype ↥S] , S.to_finset.card = 10 := begin
-
+theorem open_problem_B: 
+∃ (S : finset (type_tuple ℚ k )) [fintype S] ,
+ S.card = 10 ∧ 
+ ∀ (E:set (type_tuple ℚ k )), 
+ (@is_emulator k (E) (↑S)) := begin
+ 
 sorry,
 end
+
+-- lemma open_problem_B {s : set (vector ℚ k) } [fintype s]  :
+--   s.to_finset.card = 10  :=
+-- begin
+--   sorry,
+-- end
+
+-- theorem finite.exists_finset {s :  set (vector ℚ k)} (h : s.finite) :
+--   ∃ s' : finset (vector ℚ k), ∀ a : α, a ∈ s' ↔ a ∈ s :=
+--   begin
+--   sorry,
+--   end
