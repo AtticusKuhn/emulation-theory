@@ -1,5 +1,7 @@
 --- Q[-1,1] is the set of all rationals p such that -1  p  1.
 import data.rat
+import set_theory.zfc.basic
+
 def in_range (q:ℚ) : Prop := (( q > -1) ∧  (q < 1))
 local notation `Q[-11]` := {x : ℚ // in_range x}
 --We will use a,b,c,d,e,p,q,r,s,t,u,v,w for rational numbers in Q[-1,1] unless indicated otherwise.
@@ -42,3 +44,10 @@ end
 -- 2 is an S  Q[-1,1]2 such that any pair of elements of S "look like" some pair of elements of E. I.e., for all x,y  S there exists z,w  E such that xy is order equivalent to zw. Note that we are allowing E to be finite or infinite, or even .
 -- #check E
 def is_emulator : Prop := ∀ (x y ∈   S), ∃ (z w ∈  E), (vector.append x y) == (vector.append z w)
+
+
+-- Every subset of E is an emulator of E.
+theorem subset_is_emulator:  E ⊆  S → is_emulator E S :=
+begin
+sorry,
+end
