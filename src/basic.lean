@@ -1,7 +1,8 @@
 --- Q[-1,1] is the set of all rationals p such that -1  p  1.
 import data.rat
 import set_theory.zfc.basic
-
+import data.vector
+open vector
 def in_range (q:ℚ) : Prop := (( q > -1) ∧  (q < 1))
 local notation `Q[-11]` := {x : ℚ // in_range x}
 --We will use a,b,c,d,e,p,q,r,s,t,u,v,w for rational numbers in Q[-1,1] unless indicated otherwise.
@@ -60,5 +61,9 @@ def oe (k : ℕ): setoid (tuple k) := {
   r := order_equivalent k,
   iseqv := order_equiv_is_equiv k
 }
+--ORDER INVARIANT. S  Q[-1,1]2 is order invariant if and only if for all order equivalent x,y  Q[-1,1]2, x  S  y  S. 
+
 def is_order_invaraint (S:set (type_tuple ℚ 2 )) : Prop := 
    ∀ (x y : type_tuple ℚ 2 ), (order_equivalent 2 x y) → (x ∈ S ↔ y ∈ S )
+
+def x: vector ℕ  2  :=  vector.cons 2 (vector.cons 2 vector.nil)
