@@ -136,18 +136,18 @@ theorem open_problem_B:
  S.card = 10 ∧ 
  ∀ (E:set (type_tuple ℚ k )), 
  (@is_emulator k (E) (↑S)) := begin
- 
+
+sorry,
+end
+def EM {k} (S: set (type_tuple ℚ k)): set (set (type_tuple ℚ k)) := {E : set (type_tuple ℚ k)| is_emulator E S }
+lemma EC_implies_Same_emulators: (EC E = EC S ↔ (EM E = EM S)) := begin
 sorry,
 end
 
--- lemma open_problem_B {s : set (vector ℚ k) } [fintype s]  :
---   s.to_finset.card = 10  :=
--- begin
---   sorry,
--- end
+-- THEOREM 4.3.1. Every E ⊆ Q[-1,1]2 has the same emulators as some E' ⊆ E of cardinality ≤ 150.
+theorem open_problem_A: 
+∀(S: set (type_tuple ℚ 2)), ∃ (S' : finset (type_tuple ℚ 2)), ↑S' ⊆ S ∧ S'.card ≤  150 ∧ ∀(E: set (type_tuple ℚ 2)), (@is_emulator 2 E ↑S' ↔ @is_emulator 2 E S)  := begin
 
--- theorem finite.exists_finset {s :  set (vector ℚ k)} (h : s.finite) :
---   ∃ s' : finset (vector ℚ k), ∀ a : α, a ∈ s' ↔ a ∈ s :=
---   begin
---   sorry,
---   end
+sorry,
+end
+
