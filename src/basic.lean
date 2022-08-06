@@ -6,6 +6,7 @@ import data.rat
 import tactic
 import tactic.rewrite_all.basic
 open vector
+open_locale big_operators
 
 
 def in_range (q:ℚ) : Prop := (( q > -1) ∧  (q < 1))
@@ -58,7 +59,7 @@ begin
 end
 
 -- set of equivalence classes of concatenations
-def EC {k : ℕ} (S : set (vector ℚ k)) : set (quotient (oe (k+k))) :=
+def EC {k : ℕ} (S : set (type_tuple ℚ k)) : set (quotient (oe (k+k))) :=
 {c : quotient (oe (k+k)) | ∃ (x y ∈ S), c = ⟦vector.append x y⟧}
 
 -- definition of emulators
@@ -143,10 +144,38 @@ def EM {k} (S: set (type_tuple ℚ k)): set (set (type_tuple ℚ k)) := {E : set
 lemma EC_implies_Same_emulators: (EC E = EC S ↔ (EM E = EM S)) := begin
 sorry,
 end
+-- stirling numbers of the second kind
+--S2(n, k) = k*S2(n-1, k) + S2(n-1, k-1), n > 1. 
+--S2(1, k) = 0, k > 1. 
+-- S2(1, 1) = 1.
+def S2 : ℕ → ℕ → ℕ 
+  | (nat.succ x) 0:= 0
+  | 0 0 :=1
+  | 0 x := 0
+  | 1 1 := 1
+  |1  (nat.succ k) := 0
+  | (nat.succ n) (nat.succ k) := (nat.succ k)*(S2 n (nat.succ k))+ S2 n k
+--ot(k) is also the number of ways a horse race with k horses can end with ties allowed.
+-- here is an entry on these ot(k), and they are called Fubini Numbers. See https://oeis.org/A000670 about these Fubini numbers, ot(k).
+def ot:  ℕ → ℕ 
+  | 0 := 1
+  | x := ∑  n in finset.range (x+1),  (S2 x n)*(nat.factorial x)
+
+@[simp]
+lemma EC_card :∀ (E: finset (type_tuple ℚ k)), (@EC k ↑E).to_finset.card = ot E.card :=
+begin
+sorry,
+end
+
 
 -- THEOREM 4.3.1. Every E ⊆ Q[-1,1]2 has the same emulators as some E' ⊆ E of cardinality ≤ 150.
 theorem open_problem_A: 
-∀(S: set (type_tuple ℚ 2)), ∃ (S' : finset (type_tuple ℚ 2)), ↑S' ⊆ S ∧ S'.card ≤  150 ∧ ∀(E: set (type_tuple ℚ 2)), (@is_emulator 2 E ↑S' ↔ @is_emulator 2 E S)  := begin
+∀(S: set (type_tuple ℚ 2)), 
+∃ (S' : finset (type_tuple ℚ 2)), ↑S' ⊆ S 
+∧ S'.card ≤  150 ∧ 
+∀(E: set (type_tuple ℚ 2)), 
+(@is_emulator 2 E S' ↔ @is_emulator 2 E S)  
+:= begin
 
 sorry,
 end
