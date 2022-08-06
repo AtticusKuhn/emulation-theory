@@ -2,10 +2,26 @@
 import data.rat
 import set_theory.zfc.basic
 import data.vector
-open vector
-
 import data.rat
 import tactic
+open vector
+
+
+def in_range (q:ℚ) : Prop := (( q > -1) ∧  (q < 1))
+local notation `Q[-11]` := {x : ℚ // in_range x}
+--We will use a,b,c,d,e,p,q,r,s,t,u,v,w for rational numbers in Q[-1,1] unless indicated otherwise.
+variables (a b c d e p q r s t u v w : Q[-11])
+-- We use n,m,i,j,k for positive integers unless otherwise indicated. 
+variables (n m i j k : ℕ)
+-- We use A,B,C,D,E,S,T,U,V for subsets of Q[-1,1]2 unless indicated otherwise. We use  for subset.
+-- variables (A B C D E S T U V :  set ( Q[-11] ×  Q[-11]) )
+
+--A
+-- k is the set of all k-tuples of elements of A. They are written (x1,...,xk), where x1,...,xk  A. Usually, we focus on small k, say k = 1,2,3,4. 
+def type_tuple (t:Type ) (n : ℕ )  : Type := vector t n
+def tuple (n : ℕ ) : Type := type_tuple  ℚ n 
+
+variables (A B C D E S T U V :   set (type_tuple ℚ 2 )) 
 
 -- definition of order equivalence
 def order_equivalent (k : ℕ) (x : vector ℚ k) (y : vector ℚ k) : Prop :=
@@ -62,7 +78,7 @@ begin
   exact ⟨z,w,⟨hzS,hwS,by rw h⟩⟩,
 
   intros h x y hxE hyE,
-  have hEC : ⟦vector.append x y⟧ ∈ EC E,
+  have hEC : ⟦vector.append x hxE⟧ ∈ EC E,
     from ⟨x,y,hxE,hyE,by refl⟩,
   rcases h hEC with ⟨z,w,hzS,hwS,h⟩,
   rw quotient_eq' at h,
@@ -70,7 +86,7 @@ begin
 end
 
 -- Every subset of E is an emulator of E.
-theorem subset_is_emulator:  E ⊆  S → is_emulator E S :=
+theorem subset_is_emulator:  E ⊆  S → is_emulator  E S :=
 begin
 sorry,
 end
