@@ -129,15 +129,37 @@ def is_linear_comb (f : type_tuple ℚ k  → Prop): Prop := ∃ (g h :  type_tu
 f =λx, g x ∧ h x ∧ is_linear k g ∧ is_linear k h
 def is_order_theoretic (S:set (type_tuple ℚ k )):Prop 
 := ∃ (f : (type_tuple ℚ k  → Prop)),  is_linear_comb k f
+--(1,4), (4,1), (2,3), (3,2), (2,5), (5,2), (4,5), (5,4), (2,2), (3,3)
+def ex: finset (type_tuple ℚ 2 )
+  := {
+    vector.cons 1 (vector.cons 4 vector.nil),
+    vector.cons 4 (vector.cons 1 vector.nil),
+    vector.cons 2 (vector.cons 3 vector.nil),
+    vector.cons 3 (vector.cons 2 vector.nil),
+    vector.cons 2 (vector.cons 5 vector.nil),
+    vector.cons 5 (vector.cons 2 vector.nil),
+    vector.cons 4 (vector.cons 5 vector.nil),
+    vector.cons 5 (vector.cons 4 vector.nil),
+    vector.cons 2 (vector.cons 2 vector.nil),
+    vector.cons 3 (vector.cons 3 vector.nil)
+    }
 
-
+lemma excard: (ex.card = 10) := begin
+sorry,
+end
 -- OPEN PROBLEM B. What is the smallest cardinality m of such an E in 11? What is the relationship between the n in Open Problem A and this m here? 
 theorem open_problem_B: 
-∃ (S : finset (type_tuple ℚ k )) [fintype S] ,
+∃ (S : finset (type_tuple ℚ 2 )) ,
  S.card = 10 ∧ 
- ∀ (E:set (type_tuple ℚ k )), 
- (@is_emulator k (E) (↑S)) := begin
-
+ ∀ (E:set (type_tuple ℚ 2 )), 
+ (@is_emulator 2 (E) (↑S)) := begin
+use ex,
+split,
+{
+  exact excard,
+},
+intros E,
+-- simp,
 sorry,
 end
 def EM {k} (S: set (type_tuple ℚ k)): set (set (type_tuple ℚ k)) := {E : set (type_tuple ℚ k)| is_emulator E S }
@@ -160,23 +182,34 @@ def S2 : ℕ → ℕ → ℕ
 def ot:  ℕ → ℕ 
   | 0 := 1
   | x := ∑  n in finset.range (x+1),  (S2 x n)*(nat.factorial x)
-
+lemma EC_is_finite: ∀(E: finset (type_tuple ℚ k)), (@EC k ↑E).finite :=
+begin
+sorry,
+end
+instance EC_fintype (E: finset (type_tuple ℚ k)) : fintype (@EC k ↑E) := begin
+sorry,
+end
 @[simp]
 lemma EC_card :∀ (E: finset (type_tuple ℚ k)), (@EC k ↑E).to_finset.card = ot E.card :=
 begin
 sorry,
 end
-
-
 -- THEOREM 4.3.1. Every E ⊆ Q[-1,1]2 has the same emulators as some E' ⊆ E of cardinality ≤ 150.
 theorem open_problem_A: 
 ∀(S: set (type_tuple ℚ 2)), 
 ∃ (S' : finset (type_tuple ℚ 2)), ↑S' ⊆ S 
 ∧ S'.card ≤  150 ∧ 
 ∀(E: set (type_tuple ℚ 2)), 
-(@is_emulator 2 E S' ↔ @is_emulator 2 E S)  
+(EM (↑S')  = EM S)  
 := begin
-
+let x:ℕ := ot 4,
+have x_ot_4  : x = ot 4 := by refl,
+have x_eq_150: x = 150 := begin
+rw x_ot_4,
+sorry,
+end,
+intros S,
+-- rw ←  EC_implies_Same_emulators,
 sorry,
 end
 
