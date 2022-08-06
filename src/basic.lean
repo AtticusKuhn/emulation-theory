@@ -21,7 +21,7 @@ variables (n m i j k : ℕ)
 def type_tuple (t:Type ) (n : ℕ )  : Type := vector t n
 def tuple (n : ℕ ) : Type := type_tuple  ℚ n 
 
-variables (A B C D E S T U V :   set (type_tuple ℚ k )) 
+variables (A B C D E S T U V :   set (type_tuple ℚ k )) [fintype ↥S]
 variables (v1 v2 v3 :   vector ℚ k) 
 
 -- definition of order equivalence
@@ -128,3 +128,10 @@ def is_linear_comb (f : type_tuple ℚ k  → Prop): Prop := ∃ (g h :  type_tu
 f =λx, g x ∧ h x ∧ is_linear k g ∧ is_linear k h
 def is_order_theoretic (S:set (type_tuple ℚ k )):Prop 
 := ∃ (f : (type_tuple ℚ k  → Prop)),  is_linear_comb k f
+
+
+-- OPEN PROBLEM B. What is the smallest cardinality m of such an E in 11? What is the relationship between the n in Open Problem A and this m here? 
+theorem open_problem_B: ∃ (S : set (type_tuple ℚ k )) [fintype ↥S] , S.to_finset.card = 10 := begin
+
+sorry,
+end
