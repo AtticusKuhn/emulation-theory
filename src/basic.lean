@@ -86,11 +86,7 @@ begin
   rw quotient_eq' at h,
   exact ⟨z,w,hzS,hwS,h⟩,
 end
-lemma ord_equiv_refl: order_equivalent (k) v1 v1 := begin
-rw order_equivalent,
-intros i j,
-refl,
-end
+
 -- Every subset of E is an emulator of E.
 theorem subset_is_emulator:  E ⊆  S → is_emulator  E S :=
 begin
@@ -103,12 +99,24 @@ begin
   use y,
   split,
   exact set.mem_of_subset_of_mem E_subset_S y_in_E,
-  exact ord_equiv_refl (k+k) (x.append y),
+  exact (order_equiv_is_equiv (k+k)).1  (x.append y),
 end
 -- -If S is an emulator of E and T is an emulator of S then T is an emulator of E.
 theorem emulator_transitivity:   is_emulator S E ∧ is_emulator T S → is_emulator T E :=
 begin
-sorry,
+intros h,
+cases h with e_S_E e_T_S,
+rw is_emulator,
+rw is_emulator at e_S_E,
+rw is_emulator at e_T_S,
+intros x x_in_T y y_in_T,
+have S_emulates_T := e_T_S x x_in_T y y_in_T,
+rcases S_emulates_T with ⟨ z,z_in_S,w, w_in_S, ord_equiv⟩ ,
+have E_emulates_S := e_S_E z z_in_S w w_in_S,
+rcases E_emulates_S with ⟨ g,g_in_E,h, h_in_E, ord_equiv2⟩ ,
+have trans := (order_equiv_is_equiv (k+k)).2.2 ord_equiv ord_equiv2,
+exact ⟨g,g_in_E,h,h_in_E ,trans⟩, 
+
 end
 
 --This is useless
