@@ -21,7 +21,8 @@ variables (n m i j k : ℕ)
 def type_tuple (t:Type ) (n : ℕ )  : Type := vector t n
 def tuple (n : ℕ ) : Type := type_tuple  ℚ n 
 
-variables (A B C D E S T U V :   set (type_tuple ℚ 2 )) 
+variables (A B C D E S T U V :   set (type_tuple ℚ k )) 
+variables (v1 v2 v3 :   vector ℚ k) 
 
 -- definition of order equivalence
 def order_equivalent (k : ℕ) (x : vector ℚ k) (y : vector ℚ k) : Prop :=
@@ -78,17 +79,31 @@ begin
   exact ⟨z,w,⟨hzS,hwS,by rw h⟩⟩,
 
   intros h x y hxE hyE,
+
   have hEC : ⟦vector.append x hxE⟧ ∈ EC E,
     from ⟨x,y,hxE,hyE,by refl⟩,
   rcases h hEC with ⟨z,w,hzS,hwS,h⟩,
   rw quotient_eq' at h,
   exact ⟨z,w,hzS,hwS,h⟩,
 end
-
+lemma ord_equiv_refl: order_equivalent (k) v1 v1 := begin
+rw order_equivalent,
+intros i j,
+refl,
+end
 -- Every subset of E is an emulator of E.
 theorem subset_is_emulator:  E ⊆  S → is_emulator  E S :=
 begin
-sorry,
+  intros E_subset_S,
+  rw is_emulator,
+  intros x x_in_E y y_in_E,
+  use  x ,
+  split,
+  exact set.mem_of_subset_of_mem E_subset_S x_in_E,
+  use y,
+  split,
+  exact set.mem_of_subset_of_mem E_subset_S y_in_E,
+  exact ord_equiv_refl (k+k) (x.append y),
 end
 -- -If S is an emulator of E and T is an emulator of S then T is an emulator of E.
 theorem emulator_transitivity:   is_emulator S E ∧ is_emulator T S → is_emulator T E :=
@@ -99,7 +114,6 @@ end
 --This is useless
 --ORDER INVARIANT. S  Q[-1,1]2 is order invariant if and only if for all order equivalent x,y  Q[-1,1]2, x  S  y  S. 
 
-def is_order_invaraint (S:set (type_tuple ℚ 2 )) : Prop := 
-   ∀ (x y : type_tuple ℚ 2 ), (order_equivalent 2 x y) → (x ∈ S ↔ y ∈ S )
+def is_order_invaraint (S:set (type_tuple ℚ k )) : Prop := 
+   ∀ (x y : type_tuple ℚ k ), (order_equivalent k x y) → (x ∈ S ↔ y ∈ S )
 
-def x: vector ℕ  2  :=  vector.cons 2 (vector.cons 2 vector.nil)
