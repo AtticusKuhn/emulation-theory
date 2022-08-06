@@ -51,3 +51,8 @@ theorem subset_is_emulator:  E ⊆  S → is_emulator E S :=
 begin
 sorry,
 end
+-- -If S is an emulator of E and T is an emulator of S then T is an emulator of E.
+theorem emulator_transitivity:   is_emulator S E ∧ is_emulator T S → is_emulator T E :=
+begin
+sorry,
+end
