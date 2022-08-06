@@ -103,7 +103,7 @@ begin
 end
 -- -If S is an emulator of E and T is an emulator of S then T is an emulator of E.
 
-theorem emulator_trans {k : ℕ} (A B C : set (vector ℚ k)) :
+theorem emulator_trans :
   is_emulator A B → is_emulator B C → is_emulator A C :=
 begin
   intros h1 h2,
@@ -117,3 +117,14 @@ end
 def is_order_invaraint (S:set (type_tuple ℚ k )) : Prop := 
    ∀ (x y : type_tuple ℚ k ), (order_equivalent k x y) → (x ∈ S ↔ y ∈ S )
 
+def is_linear (f : type_tuple ℚ k  → Prop): Prop := ∃(c :ℚ), ∃(n m:fin k), 
+(f =λ x, x.nth n > c)
+∨ 
+(f =λ x, x.nth n < c)
+∨ 
+(f =λ x, x.nth n < x.nth m)
+
+def is_linear_comb (f : type_tuple ℚ k  → Prop): Prop := ∃ (g h :  type_tuple ℚ k  → Prop),
+f =λx, g x ∧ h x ∧ is_linear k g ∧ is_linear k h
+def is_order_theoretic (S:set (type_tuple ℚ k )):Prop 
+:= ∃ (f : (type_tuple ℚ k  → Prop)),  is_linear_comb k f
