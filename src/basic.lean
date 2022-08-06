@@ -27,7 +27,7 @@ def order_equivalent (k: ℕ) (x: tuple k) (y: tuple k) : Prop :=
  --THEOREM 4.2.1. Order equivalence is an equivalence relation on Qk. I.e., for all x,y,z  Qk, 
 -- i. x,x are order equivalent.
 -- ii. x,y are order equivalent if and only if y,x are order equivalent.
-theorem order_equiv_is_equiv {k: ℕ}: equivalence (order_equivalent k) :=
+theorem order_equiv_is_equiv (k: ℕ): equivalence (order_equivalent k) :=
 begin
   -- intro k,
   split,
@@ -56,4 +56,7 @@ begin
 sorry,
 end
 
-
+def oe (k : ℕ): setoid (tuple k) := {
+  r := order_equivalent k,
+  iseqv := order_equiv_is_equiv k
+}
