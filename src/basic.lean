@@ -81,7 +81,6 @@ begin
   exact ⟨z,w,⟨hzS,hwS,by rw h⟩⟩,
 
   intros h x y hxE hyE,
-
   have hEC : ⟦vector.append x hxE⟧ ∈ EC E,
     from ⟨x,y,hxE,hyE,by refl⟩,
   rcases h hEC with ⟨z,w,hzS,hwS,h⟩,
@@ -89,30 +88,37 @@ begin
   exact ⟨z,w,hzS,hwS,h⟩,
 end
 
--- Every subset of E is an emulator of E.
-theorem subset_is_emulator:  E ⊆  S → is_emulator  E S :=
+-- The EC of a subset is a subset of the EC
+theorem subset_EC_subset {k : ℕ} (E S : set (vector ℚ k)) :
+  E ⊆ S → (EC E) ⊆ (EC S) :=
 begin
-  intros E_subset_S,
-  rw is_emulator,
-  intros x x_in_E y y_in_E,
-  use  x ,
-  split,
-  exact set.mem_of_subset_of_mem E_subset_S x_in_E,
-  use y,
-  split,
-  exact set.mem_of_subset_of_mem E_subset_S y_in_E,
-  exact (order_equiv_is_equiv (k+k)).1  (x.append y),
+  intros hES x,
+  apply quotient.induction_on x,
+  intros a haE,
+  rcases haE with ⟨x,y,hxE,hyE,h⟩,
+  exact ⟨x,y,hES hxE,hES hyE,by rw h⟩,
 end
--- -If S is an emulator of E and T is an emulator of S then T is an emulator of E.
 
-theorem emulator_trans :
+-- every subset is an emulator
+theorem subset_emulator {k : ℕ} (E S : set (vector ℚ k)) :
+  E ⊆ S → is_emulator E S :=
+begin
+  rw emulator_iff_EC_subset,
+  exact subset_EC_subset E S,
+end
+
+-- emulator-ness is transitive
+theorem emulator_trans {k : ℕ} (A B C : set (vector ℚ k)) :
   is_emulator A B → is_emulator B C → is_emulator A C :=
 begin
-  repeat{ rw emulator_iff_EC_subset at  ⊢},
-  exact subset_trans,
+  intros h1 h2,
+  rw emulator_iff_EC_subset at h1 h2 ⊢,
+  -- exact subset_trans h1 h2,
+  intros x h,
+  exact h2 (h1 h),
 end
 
---This is useless
+/-
 --ORDER INVARIANT. S  Q[-1,1]2 is order invariant if and only if for all order equivalent x,y  Q[-1,1]2, x  S  y  S. 
 
 def is_order_invaraint (S:set (type_tuple ℚ k )) : Prop := 
@@ -129,6 +135,8 @@ def is_linear_comb (f : type_tuple ℚ k  → Prop): Prop := ∃ (g h :  type_tu
 f =λx, g x ∧ h x ∧ is_linear k g ∧ is_linear k h
 def is_order_theoretic (S:set (type_tuple ℚ k )):Prop 
 := ∃ (f : (type_tuple ℚ k  → Prop)),  is_linear_comb k f
+-/
+
 --(1,4), (4,1), (2,3), (3,2), (2,5), (5,2), (4,5), (5,4), (2,2), (3,3)
 def ex: finset (type_tuple ℚ 2 )
   := {
@@ -147,6 +155,8 @@ def ex: finset (type_tuple ℚ 2 )
 lemma excard: (ex.card = 10) := begin
 sorry,
 end
+
+-- Maybe a new file for this
 -- OPEN PROBLEM B. What is the smallest cardinality m of such an E in 11? What is the relationship between the n in Open Problem A and this m here? 
 theorem open_problem_B: 
 ∃ (S : finset (type_tuple ℚ 2 )) ,
