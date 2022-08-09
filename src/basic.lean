@@ -26,9 +26,12 @@ def tuple (n : ℕ ) : Type := type_tuple  ℚ n
 variables (A B C D E S T U V :   set (type_tuple ℚ k )) [fintype ↥S]
 variables (v1 v2 v3 :   type_tuple ℚ k) 
 
+
+-- start of the first file. put other stuff in a new file
+
 -- definition of order equivalence
-def order_equivalent (k : ℕ) (x : vector ℚ k) (y : vector ℚ k) : Prop :=
-∀(i j : fin k), (x.nth i) < (x.nth j) ↔ (y.nth i) < (y.nth j)
+def order_equivalent (k : ℕ) (x y : vector ℚ k) : Prop :=
+  ∀ (i j : fin k), (x.nth i) < (x.nth j) ↔ (y.nth i) < (y.nth j)
 
 -- order equivalence is an equivalence relation
 theorem order_equiv_is_equiv (k : ℕ) : equivalence (order_equivalent k) :=
@@ -52,23 +55,24 @@ def oe (k : ℕ) : setoid (vector ℚ k) := {
 attribute [instance] oe
 
 -- QoL
-lemma quotient_eq' (k : ℕ) (a b : vector ℚ k) : ⟦a⟧ = ⟦b⟧ ↔ order_equivalent k a b := 
+lemma quotient_eq {k : ℕ} (a b : vector ℚ k) : ⟦a⟧ = ⟦b⟧ ↔ order_equivalent k a b := 
 begin
   rw quotient.eq,
   refl,
 end
 
--- set of equivalence classes of concatenations
-def EC {k : ℕ} (S : set (type_tuple ℚ k)) : set (quotient (oe (k+k))) :=
-{c : quotient (oe (k+k)) | ∃ (x y ∈ S), c = ⟦vector.append x y⟧}
-
--- definition of emulators
-def is_emulator {k : ℕ} (E S : set (type_tuple ℚ k)): Prop :=
+-- E is an emulator of S iff the concatenation of any two elements of E 
+-- is order equivalent to a concatenation of some two elements of S
+def is_emulator {k : ℕ} (E S : set (vector ℚ k)): Prop :=
 ∀ (x y ∈ E), ∃ (z w ∈ S), order_equivalent (k+k) (vector.append x y) (vector.append z w)
 
--- very useful relation between emulators and EC's
-theorem emulator_iff_EC_subset (k : ℕ) {E S : set (vector ℚ k)}: 
-  is_emulator E S ↔ (EC E) ⊆ (EC S) :=
+-- The EC is the set of equivalence classes of concatenations
+def EC {k : ℕ} (S : set (vector ℚ k)) : set (quotient (oe (k+k))) :=
+{c : quotient (oe (k+k)) | ∃ (x y ∈ S), c = ⟦vector.append x y⟧}
+
+-- E is an emulator of S iff the EC of E is a subset of the EC of S
+theorem emulator_iff_EC_subset {k : ℕ} (E S : set (vector ℚ k)) :
+  is_emulator E S ↔ EC E ⊆ EC S :=
 begin
   split,
   intros h x,
@@ -76,21 +80,21 @@ begin
   intros a hE,
   rcases hE with ⟨x,y,hxE,hyE,he⟩,
   rcases h x y hxE hyE with ⟨z,w,hzS,hwS,h⟩,
-  rw ← quotient_eq' at h,
+  rw ← quotient_eq at h,
   rw he,
   exact ⟨z,w,⟨hzS,hwS,by rw h⟩⟩,
 
   intros h x y hxE hyE,
-  have hEC : ⟦vector.append x hxE⟧ ∈ EC E,
+  have hEC : ⟦vector.append x y⟧ ∈ EC E,
     from ⟨x,y,hxE,hyE,by refl⟩,
   rcases h hEC with ⟨z,w,hzS,hwS,h⟩,
-  rw quotient_eq' at h,
+  rw quotient_eq at h,
   exact ⟨z,w,hzS,hwS,h⟩,
 end
 
 -- The EC of a subset is a subset of the EC
 theorem subset_EC_subset {k : ℕ} (E S : set (vector ℚ k)) :
-  E ⊆ S → (EC E) ⊆ (EC S) :=
+  E ⊆ S → EC E ⊆ EC S :=
 begin
   intros hES x,
   apply quotient.induction_on x,
@@ -99,7 +103,7 @@ begin
   exact ⟨x,y,hES hxE,hES hyE,by rw h⟩,
 end
 
--- every subset is an emulator
+-- Every subset is an emulator
 theorem subset_emulator {k : ℕ} (E S : set (vector ℚ k)) :
   E ⊆ S → is_emulator E S :=
 begin
@@ -107,16 +111,99 @@ begin
   exact subset_EC_subset E S,
 end
 
--- emulator-ness is transitive
+-- Anything is an emulator of itself
+theorem emulator_refl {k : ℕ} (S : set (vector ℚ k)) :
+  is_emulator S S :=
+begin
+  apply subset_emulator,
+  exact rfl.subset,
+end
+
+-- Emulator-ness is transitive
 theorem emulator_trans {k : ℕ} (A B C : set (vector ℚ k)) :
   is_emulator A B → is_emulator B C → is_emulator A C :=
 begin
   intros h1 h2,
   rw emulator_iff_EC_subset at h1 h2 ⊢,
-  -- exact subset_trans h1 h2,
-  intros x h,
-  exact h2 (h1 h),
+  exact set.subset.trans h1 h2,
 end
+
+-- Two sets are related iff they are emulators of each other
+def related {k : ℕ} (S T : set (vector ℚ k)) : Prop :=
+  is_emulator S T ∧ is_emulator T S
+
+-- Two sets are related iff the ECs are equal
+theorem related_iff_EC_eq {k : ℕ} (S T : set (vector ℚ k)) :
+  related S T ↔ EC S = EC T := 
+begin
+  split,
+  rintro ⟨h1,h2⟩,
+  rw emulator_iff_EC_subset at h1 h2,
+  exact set.subset.antisymm h1 h2,
+
+  intro h,
+  split,
+  rw emulator_iff_EC_subset,
+  exact eq.subset h,
+  rw emulator_iff_EC_subset,
+  exact (eq.symm h).subset,
+end
+
+-- Two sets are related iff they have the same emulators
+theorem related_iff_same_emulator {k : ℕ} (S T : set (vector ℚ k)) :
+  related S T ↔ ∀ (E : set (vector ℚ k)), (is_emulator E S ↔ is_emulator E T) := 
+begin
+  split,
+  rintros ⟨h1,h2⟩ E,
+  rw emulator_iff_EC_subset at h1 h2 ⊢,
+  rw emulator_iff_EC_subset,
+  split,
+    intro h,
+    exact set.subset.trans h h1,
+    intro h,
+    exact set.subset.trans h h2,
+
+  intro h,
+  have h1 := (h S).1 (emulator_refl S),
+  have h2 := (h T).2 (emulator_refl T),
+  exact ⟨h1,h2⟩,
+end
+
+-- Two sets have the same emulators iff the ECs are equal
+theorem same_emulator_iff_EC_eq {k : ℕ} (S T : set (vector ℚ k)) :
+  (∀ (E : set (vector ℚ k)), (is_emulator E S ↔ is_emulator E T)) ↔ EC S = EC T :=
+begin
+  rw ← related_iff_same_emulator,
+  rw related_iff_EC_eq,
+end
+
+-- Related-ness is an equivalence relation
+theorem related_refl {k : ℕ} (S : set (vector ℚ k)) :
+  related S S :=
+begin
+  exact ⟨emulator_refl S,emulator_refl S⟩,
+end
+
+theorem related_symm {k : ℕ} (S T : set (vector ℚ k)) :
+  related S T → related T S :=
+begin
+  rintro ⟨h1,h2⟩,
+  exact ⟨h2,h1⟩,
+end
+
+theorem related_trans {k : ℕ} (A B C : set (vector ℚ k)) :
+  related A B → related B C → related A C :=
+begin
+  rintros ⟨h1,h2⟩ ⟨h3,h4⟩,
+  exact ⟨emulator_trans A B C h1 h3,
+        emulator_trans C B A h4 h2⟩,
+end
+
+
+
+
+
+-- new file here
 
 /-
 --ORDER INVARIANT. S  Q[-1,1]2 is order invariant if and only if for all order equivalent x,y  Q[-1,1]2, x  S  y  S. 
