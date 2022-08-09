@@ -84,9 +84,9 @@ begin
   rw he,
   exact ⟨z,w,⟨hzS,hwS,by rw h⟩⟩,
 
-  intros h x y hxE hyE,
+  intros h x hxE y hyE,
   have hEC : ⟦vector.append x y⟧ ∈ EC E,
-    from ⟨x,y,hxE,hyE,by refl⟩,
+    from ⟨x, hxE, y, hyE,by refl⟩,
   rcases h hEC with ⟨z,w,hzS,hwS,h⟩,
   rw quotient_eq at h,
   exact ⟨z,w,hzS,hwS,h⟩,
@@ -99,8 +99,9 @@ begin
   intros hES x,
   apply quotient.induction_on x,
   intros a haE,
-  rcases haE with ⟨x,y,hxE,hyE,h⟩,
-  exact ⟨x,y,hES hxE,hES hyE,by rw h⟩,
+  rcases haE with ⟨x,hxE,y,hyE,h⟩,
+  -- exact x,
+  exact ⟨x,hES hxE,y,hES hyE,by rw h⟩,
 end
 
 -- Every subset is an emulator
@@ -246,9 +247,9 @@ end
 -- Maybe a new file for this
 -- OPEN PROBLEM B. What is the smallest cardinality m of such an E in 11? What is the relationship between the n in Open Problem A and this m here? 
 theorem open_problem_B: 
-∃ (S : finset (type_tuple ℚ 2 )) ,
+∃ (S : finset (vector ℚ 2 )) ,
  S.card = 10 ∧ 
- ∀ (E:set (type_tuple ℚ 2 )), 
+ ∀ (E:set (vector ℚ 2 )), 
  (@is_emulator 2 (E) (↑S)) := begin
 use ex,
 split,
@@ -279,15 +280,15 @@ def S2 : ℕ → ℕ → ℕ
 def ot:  ℕ → ℕ 
   | 0 := 1
   | x := ∑  n in finset.range (x+1),  (S2 x n)*(nat.factorial x)
-lemma EC_is_finite: ∀(E: finset (type_tuple ℚ k)), (@EC k ↑E).finite :=
+lemma EC_is_finite: ∀(E: finset (vector ℚ k)), (@EC k ↑E).finite :=
 begin
 sorry,
 end
-instance EC_fintype (E: finset (type_tuple ℚ k)) : fintype (@EC k ↑E) := begin
+instance EC_fintype (E: finset (vector ℚ k)) : fintype (@EC k ↑E) := begin
 sorry,
 end
 @[simp]
-lemma EC_card :∀ (E: finset (type_tuple ℚ k)), (@EC k ↑E).to_finset.card = ot E.card :=
+lemma EC_card :∀ (E: finset (vector ℚ k)), (@EC k ↑E).to_finset.card = ot E.card :=
 begin
 sorry,
 end
