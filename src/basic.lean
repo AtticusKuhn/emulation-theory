@@ -7,7 +7,7 @@ import tactic
 import tactic.rewrite_all.basic
 open vector
 open_locale big_operators
-
+ namespace emulators
 
 def in_range (q:ℚ) : Prop := (( q > -1) ∧  (q < 1))
 local notation `Q[-11]` := {x : ℚ // in_range x}
@@ -20,11 +20,11 @@ variables (n m i j k : ℕ)
 
 --A
 -- k is the set of all k-tuples of elements of A. They are written (x1,...,xk), where x1,...,xk  A. Usually, we focus on small k, say k = 1,2,3,4. 
-def type_tuple (t:Type ) (n : ℕ )  : Type := vector t n
-def tuple (n : ℕ ) : Type := type_tuple  ℚ n 
+-- def type_tuple (t:Type ) (n : ℕ )  : Type := vector t n
+-- def tuple (n : ℕ ) : Type := vector  ℚ n 
 
-variables (A B C D E S T U V :   set (type_tuple ℚ k )) [fintype ↥S]
-variables (v1 v2 v3 :   type_tuple ℚ k) 
+variables (A B C D E S T U V :   set (vector ℚ k )) [fintype ↥S]
+variables (v1 v2 v3 :   vector ℚ k) 
 
 
 -- start of the first file. put other stuff in a new file
@@ -209,105 +209,23 @@ end
 /-
 --ORDER INVARIANT. S  Q[-1,1]2 is order invariant if and only if for all order equivalent x,y  Q[-1,1]2, x  S  y  S. 
 
-def is_order_invaraint (S:set (type_tuple ℚ k )) : Prop := 
-   ∀ (x y : type_tuple ℚ k ), (order_equivalent k x y) → (x ∈ S ↔ y ∈ S )
+def is_order_invaraint (S:set (vector ℚ k )) : Prop := 
+   ∀ (x y : vector ℚ k ), (order_equivalent k x y) → (x ∈ S ↔ y ∈ S )
 
-def is_linear (f : type_tuple ℚ k  → Prop): Prop := ∃(c :ℚ), ∃(n m:fin k), 
+def is_linear (f : vector ℚ k  → Prop): Prop := ∃(c :ℚ), ∃(n m:fin k), 
 (f =λ x, x.nth n > c)
 ∨ 
 (f =λ x, x.nth n < c)
 ∨ 
 (f =λ x, x.nth n < x.nth m)
 
-def is_linear_comb (f : type_tuple ℚ k  → Prop): Prop := ∃ (g h :  type_tuple ℚ k  → Prop),
+def is_linear_comb (f : vector ℚ k  → Prop): Prop := ∃ (g h :  vector ℚ k  → Prop),
 f =λx, g x ∧ h x ∧ is_linear k g ∧ is_linear k h
-def is_order_theoretic (S:set (type_tuple ℚ k )):Prop 
-:= ∃ (f : (type_tuple ℚ k  → Prop)),  is_linear_comb k f
+def is_order_theoretic (S:set (vector ℚ k )):Prop 
+:= ∃ (f : (vector ℚ k  → Prop)),  is_linear_comb k f
 -/
-
---(1,4), (4,1), (2,3), (3,2), (2,5), (5,2), (4,5), (5,4), (2,2), (3,3)
-def ex: finset (type_tuple ℚ 2 )
-  := {
-    vector.cons 1 (vector.cons 4 vector.nil),
-    vector.cons 4 (vector.cons 1 vector.nil),
-    vector.cons 2 (vector.cons 3 vector.nil),
-    vector.cons 3 (vector.cons 2 vector.nil),
-    vector.cons 2 (vector.cons 5 vector.nil),
-    vector.cons 5 (vector.cons 2 vector.nil),
-    vector.cons 4 (vector.cons 5 vector.nil),
-    vector.cons 5 (vector.cons 4 vector.nil),
-    vector.cons 2 (vector.cons 2 vector.nil),
-    vector.cons 3 (vector.cons 3 vector.nil)
-    }
-
-lemma excard: (ex.card = 10) := begin
-sorry,
-end
-
--- Maybe a new file for this
--- OPEN PROBLEM B. What is the smallest cardinality m of such an E in 11? What is the relationship between the n in Open Problem A and this m here? 
-theorem open_problem_B: 
-∃ (S : finset (vector ℚ 2 )) ,
- S.card = 10 ∧ 
- ∀ (E:set (vector ℚ 2 )), 
- (@is_emulator 2 (E) (↑S)) := begin
-use ex,
-split,
-{
-  exact excard,
-},
-intros E,
--- simp,
-sorry,
-end
-def EM {k} (S: set (type_tuple ℚ k)): set (set (type_tuple ℚ k)) := {E : set (type_tuple ℚ k)| is_emulator E S }
+def EM {k} (S: set (vector ℚ k)): set (set (vector ℚ k)) := {E : set (vector ℚ k)| is_emulator E S }
 lemma EC_implies_Same_emulators: (EC E = EC S ↔ (EM E = EM S)) := begin
 sorry,
 end
--- stirling numbers of the second kind
---S2(n, k) = k*S2(n-1, k) + S2(n-1, k-1), n > 1. 
---S2(1, k) = 0, k > 1. 
--- S2(1, 1) = 1.
-def S2 : ℕ → ℕ → ℕ 
-  | (nat.succ x) 0:= 0
-  | 0 0 :=1
-  | 0 x := 0
-  | 1 1 := 1
-  |1  (nat.succ k) := 0
-  | (nat.succ n) (nat.succ k) := (nat.succ k)*(S2 n (nat.succ k))+ S2 n k
---ot(k) is also the number of ways a horse race with k horses can end with ties allowed.
--- here is an entry on these ot(k), and they are called Fubini Numbers. See https://oeis.org/A000670 about these Fubini numbers, ot(k).
-def ot:  ℕ → ℕ 
-  | 0 := 1
-  | x := ∑  n in finset.range (x+1),  (S2 x n)*(nat.factorial x)
-lemma EC_is_finite: ∀(E: finset (vector ℚ k)), (@EC k ↑E).finite :=
-begin
-sorry,
-end
-instance EC_fintype (E: finset (vector ℚ k)) : fintype (@EC k ↑E) := begin
-sorry,
-end
-@[simp]
-lemma EC_card :∀ (E: finset (vector ℚ k)), (@EC k ↑E).to_finset.card = ot E.card :=
-begin
-sorry,
-end
--- THEOREM 4.3.1. Every E ⊆ Q[-1,1]2 has the same emulators as some E' ⊆ E of cardinality ≤ 150.
-theorem open_problem_A: 
-∀(S: set (type_tuple ℚ 2)), 
-∃ (S' : finset (type_tuple ℚ 2)), ↑S' ⊆ S 
-∧ S'.card ≤  150 ∧ 
-∀(E: set (type_tuple ℚ 2)), 
-(EM (↑S')  = EM S)  
-:= begin
-let x:ℕ := ot 4,
-have x_ot_4  : x = ot 4 := by refl,
-have x_eq_150: x = 150 := begin
-rw x_ot_4,
-sorry,
-end,
-intros S,
--- rw ←  EC_implies_Same_emulators,
-sorry,
-end
-
+end emulators
